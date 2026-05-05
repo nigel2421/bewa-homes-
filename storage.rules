@@ -1,0 +1,11 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /units/{ownerId}/{allPaths=**} {
+      // Owners can upload/delete their own property images
+      allow write: if request.auth != null && request.auth.uid == ownerId;
+      // Anyone can read listing images for the marketplace
+      allow read: if true;
+    }
+  }
+}

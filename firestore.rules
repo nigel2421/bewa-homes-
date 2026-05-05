@@ -1,0 +1,132 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helpers
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isSuperAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.get('email', '') == 'nigel2421@gmail.com' || 
+         request.auth.token.get('email', '') == 'bttykinjo@gmail.com' ||
+         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'host') == 'admin' ||
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'host') == 'super admin')));
+    }
+
+    function isOwner(data) {
+      return isAuthenticated() && (
+        data.ownerId == request.auth.uid || 
+        data.managerId == request.auth.uid ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.tenantId != null && 
+         data.tenantId == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.tenantId)
+      );
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow list: if isSuperAdmin();
+      allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+    }
+
+    // Units / Properties
+    match /units/{unitId} {
+      allow read: if true; 
+      allow create: if isAuthenticated();
+      allow update, delete: if isSuperAdmin() || (resource != null && isOwner(resource.data));
+    }
+
+    // Bookings
+    match /bookings/{bookingId} {
+      allow create: if true; // Allow public reservations (leads)
+      allow read: if isSuperAdmin() || (resource != null && (isOwner(resource.data) || request.auth.token.email == resource.data.email));
+      allow update, delete: if isSuperAdmin() || (resource != null && isOwner(resource.data));
+    }
+
+    // Expenses & Finances
+    match /expenses/{expenseId} {
+      allow create: if isAuthenticated();
+      allow read, update, delete: if isSuperAdmin() || (resource != null && isOwner(resource.data));
+    }
+
+    match /recurring_expenses/{expenseId} {
+      allow create: if isAuthenticated();
+      allow read, update, delete: if isSuperAdmin() || (resource != null && isOwner(resource.data));
+    }
+
+    // Reports
+    match /reports/{reportId} {
+      allow create: if isAuthenticated();
+      allow read, update, delete: if isSuperAdmin() || (resource != null && isOwner(resource.data));
+    }
+
+    // Reviews
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isSuperAdmin() || (resource != null && resource.data.userId == request.auth.uid);
+    }
+
+    // Chats & Messages
+    match /chats/{chatId} {
+      allow read, write: if isAuthenticated() && request.auth.uid in resource.data.participants;
+      allow create: if isAuthenticated();
+      
+      match /messages/{msgId} {
+        allow read: if isAuthenticated() && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+        allow create: if isAuthenticated() && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+      }
+    }
+
+    // Provider Requests
+    match /provider_requests/{reqId} {
+      allow create: if isAuthenticated();
+      allow read, update: if isSuperAdmin() || (resource != null && resource.data.userId == request.auth.uid);
+      allow delete: if isSuperAdmin();
+    }
+
+    // Leads / CRM
+    match /leads/{leadId} {
+      allow create: if true; 
+      allow read, update, delete: if isSuperAdmin() || (resource != null && isOwner(resource.data));
+    }
+
+    // Tenants Collection
+    match /tenants/{tenantId} {
+      allow read: if true; 
+      allow write: if isSuperAdmin() || (isAuthenticated() && request.auth.uid == tenantId);
+
+      match /{allPaths=**} {
+        allow read, write: if isSuperAdmin() || (isAuthenticated() && request.auth.uid == tenantId);
+      }
+    }
+    
+    // Invitations
+    match /invitations/{invId} {
+      allow read: if true; 
+      allow write: if isSuperAdmin();
+    }
+
+    // Land Listings
+    match /land_listings/{plotId} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+    // Interior Services
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+
+    // Subscriptions
+    match /subscriptions/{subId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || isSuperAdmin());
+      allow create: if isAuthenticated();
+      allow update, delete: if isSuperAdmin();
+    }
+  }
+}

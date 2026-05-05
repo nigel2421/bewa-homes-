@@ -1,0 +1,21 @@
+{
+  "name": "Bewa Homes",
+  "short_name": "Bewa Homes",
+  "description": "Professional Property Management & Short-Stay Marketplace",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fdfcf0",
+  "theme_color": "#004d40",
+  "icons": [
+    {
+      "src": "/logo-green-512.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo-green-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

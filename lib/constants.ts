@@ -1,0 +1,37 @@
+export const AMENITIES = [
+  { id: 'wifi', label: 'WiFi', icon: '📶' },
+  { id: 'parking', label: 'Parking', icon: '🚗' },
+  { id: 'pool', label: 'Swimming Pool', icon: '🏊' },
+  { id: 'gym', label: 'Gym', icon: '🏋️' },
+  { id: 'ac', label: 'Air Conditioning', icon: '❄️' },
+  { id: 'tv', label: 'Smart TV', icon: '📺' },
+  { id: 'kitchen', label: 'Full Kitchen', icon: '🍳' },
+  { id: 'washer', label: 'Washing Machine', icon: '👕' },
+  { id: 'balcony', label: 'Balcony / Terrace', icon: '🌿' },
+  { id: 'security', label: '24/7 Security', icon: '🔐' },
+  { id: 'cctv', label: 'CCTV', icon: '📷' },
+  { id: 'generator', label: 'Backup Generator', icon: '⚡' },
+  { id: 'elevator', label: 'Elevator', icon: '🛗' },
+  { id: 'pets', label: 'Pet Friendly', icon: '🐾' },
+  { id: 'breakfast', label: 'Breakfast Included', icon: '🥐' },
+  { id: 'cleaning', label: 'Daily Cleaning', icon: '🧹' },
+  { id: 'workspace', label: 'Work Desk', icon: '💻' },
+  { id: 'bbq', label: 'BBQ Area', icon: '🔥' },
+  { id: 'garden', label: 'Garden', icon: '🌳' },
+  { id: 'hotwater', label: 'Hot Water 24/7', icon: '🚿' },
+  { id: 'plwd', label: 'PLWD Accessible', icon: '♿' },
+];
+
+export const PROPERTY_TYPES = [
+  'Apartment',
+  '1 Bedroom',
+  '2 Bedroom',
+  '3 Bedroom',
+  '4 Bedroom',
+  '5 Bedroom',
+  'Penthouse',
+  'Studio',
+  'Villa',
+  'Cottage',
+  'Office'
+];
